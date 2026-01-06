@@ -3,14 +3,16 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
+const databaseUrl = process.env.DATABASE_URL;
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
   },
   engine: "classic",
-  datasource: {
-    // Use process.env directly with fallback for build-time generation
-    url: process.env.DATABASE_URL || "postgresql://placeholder:placeholder@localhost:5432/placeholder",
-  },
+  // Only set datasource if we have a real URL, otherwise let schema.prisma handle it
+  ...(databaseUrl && databaseUrl !== "postgresql://placeholder:placeholder@localhost:5432/placeholder"
+    ? { datasource: { url: databaseUrl } }
+    : {}),
 });
